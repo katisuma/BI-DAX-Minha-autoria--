@@ -111,5 +111,57 @@ CALCULATE(SUM('Dcalendario'[Dia Util]),
 FILTER(ALL('Dcalendario'),
             'Dcalendario'[Date CUSTO]<= Data_d_calendario))
 -----------------------------------------------------------------------------------------------
+Efficiency = 
+Var Eficiency = (SUMX(ACT_ZCO_STD_YTD,ACT_ZCO_STD_YTD[STD Hours]) / [Worked Hours])
+Return
+IFERROR(Eficiency,0)
+------------------------------------------------------------------------------------
+
+Efficiency BDG = 
+Var Eficiency_BDG = SUMX('Diário','Diário'[Horas STD]) / SUMX('Diário','Diário'[Horas ACT])
+Return
+IFERROR(Eficiency_BDG,0)
+---------------------------------------------------------------------------------------------
+
+Efficiency BDG Grafico = 
+VAR Efficiency_BDG = SUMX('Diário','Diário'[Horas STD]) / SUMX('Diário','Diário'[Horas ACT])
+VAR Data_Vigente = LASTDATE(ACT_ZCO_STD_YTD[Data Ajustada])
+return
+IF(SELECTEDVALUE('Calendario Geral'[WEEK])>Data_Vigente,BLANK(),Efficiency_BDG)
+----------------------------------------------------------------------------------------------
+
+Var Total_STD_Hours_ACT = SUMX(ACT_ZCO_STD_YTD,ACT_ZCO_STD_YTD[STD Hours])
+Var Total_Volume_Act_Ajustado = SUMX(Volume,Volume[MIN Yeld])
+Var Total_Volume_FRC = SUMX('FRC_SCP_STD_DAILY - YTD','FRC_SCP_STD_DAILY - YTD'[ Yeld to be FRC])
+Var Total_STD_Hours_FRC = SUMX('FRC_SCP_STD_DAILY - YTD','FRC_SCP_STD_DAILY - YTD'[Pure FRC H])
+Return
+IFERROR(Total_STD_Hours_ACT/Total_Volume_Act_Ajustado*Total_Volume_FRC-Total_STD_Hours_FRC,0)
+-------------------------------------------------------------------------------------------------
+
+Var Total_STD_Hours = SUMX(ACT_ZCO_STD_YTD,ACT_ZCO_STD_YTD[STD Hours])
+Var Total_Volume_Act_Ajustado = SUMX(Volume,Volume[MIN Yeld])
+Var Total_Volume_FRC = SUMX('FRC_SCP_STD_DAILY - YTD','FRC_SCP_STD_DAILY - YTD'[ Yeld to be FRC])
+Return
+IFERROR(Total_STD_Hours - Total_STD_Hours/Total_Volume_Act_Ajustado*Total_Volume_FRC,0)
+-------------------------------------------------------------------------------------------
+
+Var Total_ACT_Hours = SUMX('HORAS ACT','HORAS ACT'[Act Hours])
+Var Total_Training_Hours = SUMX(Treinamentos,Treinamentos[Training Hours])
+Var Total_Lending_Hours = SUMX('Ind Lending Hours','Ind Lending Hours'[Lending Hours])
+Return
+Total_ACT_Hours - Total_Training_Hours - Total_Lending_Hours
+---------------------------------------------------------------------------------------
+
+Volume = SUMMARIZE(FILTER(ACT_ZCO_STD_YTD,ACT_ZCO_STD_YTD[Filtro volume act]="Ok"),
+ACT_ZCO_STD_YTD[Data Ajustada],
+ACT_ZCO_STD_YTD[Chave Volume],
+ACT_ZCO_STD_YTD[Filtro volume act],
+ACT_ZCO_STD_YTD[Resourcename 1.0],
+ACT_ZCO_STD_YTD[Resourcename 1.1],
+ACT_ZCO_STD_YTD[Centro de Custo Ajustado],
+ACT_ZCO_STD_YTD[Classificação],
+ACT_ZCO_STD_YTD[Cluster],
+"MIN Yeld",MIN(ACT_ZCO_STD_YTD[ Yeld to be]))
+
 
 
