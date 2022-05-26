@@ -1,0 +1,115 @@
+Formulas BI 
+
+MATERIAL INDIRETO 
+
+VAR Acumulado_ACT = CALCULATE(SUMX(F_CUSTO,F_CUSTO[ACT COST]),DATESYTD('Dcalendario'[Data Ajustada]))
+VAR Data_Vigente = LASTDATE(F_CUSTO[Data ajustada])
+return
+IF(SELECTEDVALUE('Dcalendario'[Data Ajustada])>Data_Vigente,BLANK(),Acumulado_ACT)
+-----------------------------------------------------------------------------------------------------------
+
+GRAFICO DE LINHA ( CUSTOS ATUAL ) 
+
+Acumulado BDG FLEX DAILY GRAFICO = 
+
+VAR Acumulado_BDG_FLEX = CALCULATE([DAILY FLEX BDG COST GRAFICO DE LINHA],DATESYTD('Dcalendario'[Data Ajustada]))
+VAR Data_Vigente = LASTDATE(F_CUSTO[Data ajustada])
+return
+IF(SELECTEDVALUE('Dcalendario'[Data Ajustada])>Data_Vigente,BLANK(),Acumulado_BDG_FLEX)( BD FLEXBILIZADO ) 
+--------------------------------------------------------------------------------------------------------------
+
+CALCULO DAILY FLEX BDG COST GRAFICO DE LINHA = 
+
+VAR Total_Custo_BDG = SUMX('F_BUDGET DIÁRIO','F_BUDGET DIÁRIO'[CUSTO BDG])
+VAR Total_BDG_Volume = SUMX('F_BDG_SIOP_VOL DIÁRIO','F_BDG_SIOP_VOL DIÁRIO'[Vol BDG])
+VAR Total_ACT_Volume = SUMX('F_ACTVOLUME',F_ACTVOLUME[Quantidade])
+return
+Total_Custo_BDG/Total_BDG_Volume*Total_ACT_Volume
+----------------------------------------------------------------------------------------
+
+CALCULO FLEX BDG COST = 
+
+VAR Total_Custo_BDG = SUMX('F_BUDGET DIÁRIO','F_BUDGET DIÁRIO'[CUSTO BDG])
+VAR Total_BDG_Volume = SUMX('F_BDG_SIOP_VOL DIÁRIO','F_BDG_SIOP_VOL DIÁRIO'[Vol BDG])
+VAR Total_ACT_Volume = SUMX('F_ACTVOLUME',F_ACTVOLUME[Quantidade])
+return
+Total_Custo_BDG/Total_BDG_Volume*Total_ACT_Volume
+
+// foi nescessario criar a medida FLEX BDG COST pois estava dando divergencia no total YTD
+------------------------------------------------------------------------------------------------------
+
+CALCULO QTD BDG FLEX = 
+
+VAR Total_QTD_BDG = SUMX('F_BUDGET DIÁRIO','F_BUDGET DIÁRIO'[QTD BDG])
+VAR Total_BDG_Volume = SUMX('F_BDG_SIOP_VOL DIÁRIO','F_BDG_SIOP_VOL DIÁRIO'[Vol BDG])
+VAR Total_ACT_Volume = SUMX('F_ACTVOLUME',F_ACTVOLUME[Quantidade])
+return
+Total_QTD_BDG/Total_BDG_Volume*Total_ACT_Volume
+-------------------------------------------------------------------------------------------------------
+
+DAILY FLEX BDG COST GRAFICO DE LINHA = 
+SUMX(VALUES('Dcalendario'[Month]),
+                                 [CALCULO DAILY FLEX BDG COST GRAFICO DE LINHA])
+------------------------------------------------------------------------------------------------------
+
+Delta Efficiency = SUM('F_CUSTO'[ACT COST]) - ([FLEX BDG COST])
+-----------------------------------------------------------------------------
+
+Delta Efficiency YTD = CALCULATE([Delta Efficiency],'Dcalendario'[Month])
+--------------------------------------------------------------------------
+
+Delta QTD = SUM(F_CUSTO[ACT QTY]) - ([QTY FLEX BDG])
+---------------------------------------------------------------------------
+
+Delta Volume = ([FLEX BDG COST]) - SUM('F_BUDGET DIÁRIO'[CUSTO BDG])
+-------------------------------------------------------------------------
+FLEX BDG COST = SUMX(
+                     VALUES('Dcalendario'[Month]),
+                            [CALCULO FLEX BDG COST])
+-------------------------------------------------------------------------
+
+Métrica Cascata =
+
+VAR Valores_Selecionados = SELECTEDVALUE('D_Métrica Valores'[Métrica ])
+RETURN
+SWITCH(TRUE(),
+Valores_Selecionados="BDG COST",[BDG COST BRIDGE],
+Valores_Selecionados="DELTA VOLUME",[Delta Volume],
+Valores_Selecionados="FLEX BDG COST",[FLEX BDG COST],
+Valores_Selecionados="ACT COST",[ACT COST BRIDGE])
+--------------------------------------------------------------------------
+
+Dcalendario = 
+Var Data_Inicio = date(year(min('F_CUSTO'[Data de lançamento])),1,1)
+Var Data_Fim =  date(year(MAX('F_CUSTO'[Data de lançamento])),12,31)
+return 
+CALENDAR(Data_Inicio,Data_Fim)
+----------------------------------------------------------------------------
+
+Data Ajustada = 
+
+IF(WEEKDAY('Dcalendario'[Date CUSTO],2)=6 && DAY('Dcalendario'[Date CUSTO])=1,'Dcalendario'[Date CUSTO]+2,
+IF(WEEKDAY('Dcalendario'[Date CUSTO],2)=6 && DAY('Dcalendario'[Date CUSTO])=2,'Dcalendario'[Date CUSTO]-1, 
+IF(WEEKDAY('Dcalendario'[Date CUSTO],2)=7 && DAY('Dcalendario'[Date CUSTO])=1, 'Dcalendario'[Date CUSTO]+1,
+IF(WEEKDAY('Dcalendario'[Date CUSTO],2)=7 && DAY('Dcalendario'[Date CUSTO])=2,'Dcalendario'[Date CUSTO]+1,
+IF(WEEKDAY('Dcalendario'[Date CUSTO],2)=6,'Dcalendario'[Date CUSTO]-1,
+IF(WEEKDAY('Dcalendario'[Date CUSTO],2)=7,'Dcalendario'[Date CUSTO]-2,'Dcalendario'[Date CUSTO]))))))
+------------------------------------------------------------------------------------------------------
+
+Dia Util = 
+
+var Dia_da_Semana = WEEKDAY('Dcalendario'[Date CUSTO],2)
+Return
+IF(Dia_da_Semana = 6 || Dia_da_Semana = 7,0,1)
+----------------------------------------------------------------------
+
+Dia util sem feriado = IF('Dcalendario'[Dia Util]=1 && 'Dcalendario'[Feriados]=BLANK(),1,0)
+Dias Uteis acumulado = 
+var  Data_d_calendario = 'Dcalendario'[Date CUSTO]
+Return
+CALCULATE(SUM('Dcalendario'[Dia Util]),
+FILTER(ALL('Dcalendario'),
+            'Dcalendario'[Date CUSTO]<= Data_d_calendario))
+-----------------------------------------------------------------------------------------------
+
+
