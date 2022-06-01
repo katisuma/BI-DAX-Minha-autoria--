@@ -162,6 +162,18 @@ ACT_ZCO_STD_YTD[Centro de Custo Ajustado],
 ACT_ZCO_STD_YTD[Classificação],
 ACT_ZCO_STD_YTD[Cluster],
 "MIN Yeld",MIN(ACT_ZCO_STD_YTD[ Yeld to be]))
+--------------------------------------------------------------------------------
+formula dax para apresentação de DRE
+
+Realizado Final = 
+
+VAR subtotal = SELECTEDVALUE(dFormatoDRE[Subtotal?])
+VAR TOTAL_REALIZADO = SUMX(fRealizado,fRealizado[Valor Realizado])
+var realizado_subtotal = CALCULATE(TOTAL_REALIZADO,filter(ALL(dFormatoDRE),dFormatoDRE[Ordem] <= MAX(dFormatoDRE[Ordem])))
+RETURN
+IF( subtotal = 0, TOTAL_REALIZADO,
+IF(subtotal = 1 && NOT(ISINSCOPE(dPlanoContas[Nível 2])),
+realizado_subtotal))
 
 
 
