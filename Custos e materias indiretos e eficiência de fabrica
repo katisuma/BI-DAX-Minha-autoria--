@@ -1,5 +1,28 @@
 Formulas BI 
 
+Chvae estragenria e Chaves primarias
+
+Cardinalidade dos Relacionamentos 
+
+Filtro bidirecional
+
+Power BI Online
+Modos de compartilhar relatorios 
+- ver se existe workspaces na empresa falar com a TI
+
+1- os workspaces se as pessoas estao neles eles conseguem ver (menos no meu workspace) ( nao recomendado porque as pessoas podem editar os relatorios e cagar eles)
+tipos de acessos no workspaces - administradotr - colocar o visualizador 
+
+2- criar link > configuraçoes > configurações de locatorio > publicar na web > permitir codigos existente ( link qualquer pessoa pode acessar, porem tem problema de sigilo)
+
+3- exportar para power point ou pdf ( nao fica dinamico ) se ela clicar ela consegue acesso 
+
+4- compartilhar > relatorio > inserir e-mail da pessoa ( desmarcar permiryir que os destinatarios criem um conteudo ) e somente quem tem conta pro consegue ver 
+
+5- posso criar apps e as pessoas nao precisam de conta pró - workspace criado > criar a pp > instalação ( criar o layout) > navegação ( quem pode ver)
+
+6 - teams > tem que criar equipes e posso colocar o app para quem nao tem licença pro
+
 MATERIAL INDIRETO 
 
 VAR Acumulado_ACT = CALCULATE(SUMX(F_CUSTO,F_CUSTO[ACT COST]),DATESYTD('Dcalendario'[Data Ajustada]))
